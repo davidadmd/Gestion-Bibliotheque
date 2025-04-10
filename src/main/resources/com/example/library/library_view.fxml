@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" xmlns="http://javafx.com/javafx/20" spacing="10"
+      fx:controller="com.example.library.controller.LibraryController">
+
+    <HBox spacing="10">
+        <TextField fx:id="titleField" promptText="Titre du Livre"/>
+        <TextField fx:id="authorField" promptText="Auteur du Livre"/>
+        <TextField fx:id="genreField" promptText="Genre du Livre"/>
+        <TextField fx:id="editionField" promptText="Edition du Livre"/>
+        <Button text="Ajouter Livre" onAction="#addBook"/>
+        <Button text="Supprimer Livre" onAction="#deleteBook"/>
+        <Button text="Emprunter Livre" onAction="#loanBook"/>
+    </HBox>
+
+    <TableView fx:id="bookTable">
+        <columns>
+            <TableColumn fx:id="titleColumn" text="Titre"/>
+            <TableColumn fx:id="authorColumn" text="Auteur"/>
+            <TableColumn fx:id="genreColumn" text="Genre"/>
+            <TableColumn fx:id="editionColumn" text="Edition"/>
+            <TableColumn fx:id="isbnColumn" text="ISBN"/>
+            <TableColumn fx:id="statusColumn" text="Statut"/>
+            <TableColumn fx:id="loanDateColumn" text="Date d'emprunt"/>
+        </columns>
+    </TableView>
+</VBox>

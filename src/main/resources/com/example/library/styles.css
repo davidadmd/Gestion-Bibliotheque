@@ -1,0 +1,51 @@
+/* Style global pour la fenêtre */
+.root {
+    -fx-font-family: "Arial";
+    -fx-background-color: #f4f4f4;
+    -fx-padding: 20px;
+}
+
+/* Style pour les champs de texte */
+.input-field {
+    -fx-pref-width: 150px;
+    -fx-padding: 5px;
+    -fx-background-color: #ffffff;
+    -fx-border-radius: 5px;
+    -fx-border-color: #cccccc;
+    -fx-font-size: 14px;
+}
+
+/* Style pour les boutons */
+.button {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 10px 20px;
+    -fx-border-radius: 5px;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #45a049;
+}
+
+/* Style pour les TableView */
+.table-view {
+    -fx-pref-height: 300px;
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cccccc;
+    -fx-border-radius: 5px;
+}
+
+/* Style pour les en-têtes des colonnes */
+.table-column {
+    -fx-text-fill: #333333;
+    -fx-font-weight: bold;
+}
+
+/* Style pour le label d'en-tête */
+.label {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333;
+}
