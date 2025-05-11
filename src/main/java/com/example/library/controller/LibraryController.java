@@ -4,173 +4,140 @@ import com.example.library.dao.BookDAO;
 import com.example.library.model.Book;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.TableRow;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
 public class LibraryController {
-    @FXML
-    private TableView<Book> bookTable;
-    @FXML
-    private TableColumn<Book, String> titleColumn;
-    @FXML
-    private TableColumn<Book, String> authorColumn;
-    @FXML
-    private TableColumn<Book, String> genreColumn;
-    @FXML
-    private TableColumn<Book, String> editionColumn;
-    @FXML
-    private TableColumn<Book, String> isbnColumn;
-    @FXML
-    private TableColumn<Book, String> statusColumn;
-    @FXML
-    private TableColumn<Book, String> loanDateColumn; // Nouvelle colonne pour la date d'emprunt
+    @FXML private TableView<Book> bookTable;
+    @FXML private TableColumn<Book,String> titleColumn;
+    @FXML private TableColumn<Book,String> authorColumn;
+    @FXML private TableColumn<Book,String> genreColumn;
+    @FXML private TableColumn<Book,String> editionColumn;
+    @FXML private TableColumn<Book,String> isbnColumn;
+    @FXML private TableColumn<Book,String> statusColumn;
+    @FXML private TableColumn<Book,String> loanDateColumn;
 
-    @FXML
-    private TextField titleField;
-    @FXML
-    private TextField authorField;
-    @FXML
-    private TextField genreField;
-    @FXML
-    private TextField editionField;
+    @FXML private TextField titleField;
+    @FXML private TextField authorField;
+    @FXML private TextField genreField;
+    @FXML private TextField editionField;
 
     private BookDAO bookDAO;
 
+    @FXML
     public void initialize() {
-        // Configuration des colonnes
-        titleColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getTitle()));
-        authorColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getAuthor()));
-        genreColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getGenre()));
-        editionColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getEdition()));
-        isbnColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getIsbn()));
-        statusColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getStatus()));
-        loanDateColumn.setCellValueFactory(data -> new SimpleStringProperty(
-                data.getValue().getLoanDate() != null ? data.getValue().getLoanDate().toString() : ""
+        // Initialisation des colonnes
+        titleColumn.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getTitle()));
+        authorColumn.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getAuthor()));
+        genreColumn.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getGenre()));
+        editionColumn.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getEdition()));
+        isbnColumn.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getIsbn()));
+        statusColumn.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getStatus()));
+        loanDateColumn.setCellValueFactory(d -> new SimpleStringProperty(
+                d.getValue().getLoanDate()!=null
+                        ? d.getValue().getLoanDate().toString()
+                        : ""
         ));
 
-        // Mise en forme : surligner en orange les livres dont le délai de 2 semaines est dépassé
+        // Coloration des lignes en retard (orange)
         bookTable.setRowFactory(tv -> new TableRow<Book>() {
             @Override
             protected void updateItem(Book item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || item == null || item.getLoanDate() == null) {
                     setStyle("");
+                } else if (LocalDate.now().isAfter(item.getLoanDate().plusWeeks(2))) {
+                    setStyle("-fx-background-color: orange;");
                 } else {
-                    LocalDate dueDate = item.getLoanDate().plusWeeks(2);
-                    if (LocalDate.now().isAfter(dueDate)) {
-                        setStyle("-fx-background-color: orange;");
-                    } else {
-                        setStyle("");
-                    }
+                    setStyle("");
                 }
             }
         });
 
-        // Chargement des livres existants
+        // Chargement des livres depuis la BDD
         try {
             bookDAO = new BookDAO();
-            bookTable.getItems().addAll(bookDAO.getAllBooks());
+            bookTable.getItems().setAll(bookDAO.getAllBooks());
         } catch (SQLException e) {
-            showErrorDialog("Erreur lors du chargement des livres : " + e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Erreur de chargement", e.getMessage());
         }
     }
 
     @FXML
     private void addBook() {
-        String title = titleField.getText().trim();
-        String author = authorField.getText().trim();
-        String genre = genreField.getText().trim();
-        String edition = editionField.getText().trim();
-
-        if (title.isEmpty() || author.isEmpty() || genre.isEmpty() || edition.isEmpty()) {
-            showErrorDialog("Veuillez remplir tous les champs !");
+        if (titleField.getText().isBlank() || authorField.getText().isBlank()
+                || genreField.getText().isBlank()  || editionField.getText().isBlank()) {
+            showAlert(Alert.AlertType.ERROR, "Champs vides", "Veuillez remplir tous les champs !");
             return;
         }
-
-        // Création du livre sans date d'emprunt (non emprunté)
-        Book book = new Book(0, title, author, generateISBN(), "Available", genre, edition);
-
+        Book b = new Book(0,
+                titleField.getText().trim(),
+                authorField.getText().trim(),
+                "ISBN"+System.currentTimeMillis(),
+                "Available",
+                genreField.getText().trim(),
+                editionField.getText().trim()
+        );
         try {
-            bookDAO.addBook(book);
-            bookTable.getItems().add(book);
+            bookDAO.addBook(b);
+            bookTable.getItems().add(b);
             clearFields();
-            showInfoDialog("Livre ajouté avec succès !");
+            showAlert(Alert.AlertType.INFORMATION, "Ajout réussi", "Livre ajouté !");
         } catch (SQLException e) {
-            showErrorDialog("Erreur lors de l'ajout du livre : " + e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Erreur ajout", e.getMessage());
         }
     }
 
     @FXML
     private void deleteBook() {
-        Book selectedBook = bookTable.getSelectionModel().getSelectedItem();
-        if (selectedBook == null) {
-            showErrorDialog("Veuillez sélectionner un livre à supprimer !");
+        Book sel = bookTable.getSelectionModel().getSelectedItem();
+        if (sel==null) {
+            showAlert(Alert.AlertType.ERROR, "Aucune sélection", "Sélectionnez un livre !");
             return;
         }
-
         try {
-            bookDAO.deleteBook(selectedBook.getId());
-            bookTable.getItems().remove(selectedBook);
-            showInfoDialog("Livre supprimé avec succès !");
+            bookDAO.deleteBook(sel.getId());
+            bookTable.getItems().remove(sel);
+            showAlert(Alert.AlertType.INFORMATION, "Suppression", "Livre supprimé !");
         } catch (SQLException e) {
-            showErrorDialog("Erreur lors de la suppression du livre : " + e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Erreur suppression", e.getMessage());
         }
     }
 
-    // Méthode pour emprunter un livre : enregistre la date d'emprunt et met à jour le statut
+    /**
+     * Ouvre une nouvelle fenêtre pour afficher les logs d'emprunts.
+     * Implémentation standard JavaFX pour charger un FXML dans un nouveau Stage :contentReference[oaicite:2]{index=2}.
+     */
     @FXML
-    private void loanBook() {
-        Book selectedBook = bookTable.getSelectionModel().getSelectedItem();
-        if (selectedBook == null) {
-            showErrorDialog("Veuillez sélectionner un livre à emprunter !");
-            return;
-        }
-        if (selectedBook.getLoanDate() != null) {
-            showErrorDialog("Ce livre est déjà emprunté !");
-            return;
-        }
-
-        selectedBook.setLoanDate(LocalDate.now());
-        selectedBook.setStatus("Loaned");
-
+    private void openLogs() {
         try {
-            // Mettez à jour en base (vous devez implémenter cette méthode dans BookDAO)
-            bookDAO.updateBookLoan(selectedBook);
-            bookTable.refresh();
-            showInfoDialog("Livre emprunté avec succès !");
-        } catch (SQLException e) {
-            showErrorDialog("Erreur lors de l'emprunt du livre : " + e.getMessage());
+            Parent root = FXMLLoader.load(getClass().getResource("logs_view.fxml"));
+            Stage  st   = new Stage();
+            st.setTitle("Historique des Emprunts");
+            st.setScene(new Scene(root));
+            st.show();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
     private void clearFields() {
-        titleField.clear();
-        authorField.clear();
-        genreField.clear();
-        editionField.clear();
+        titleField.clear(); authorField.clear();
+        genreField.clear(); editionField.clear();
     }
 
-    private String generateISBN() {
-        return "ISBN" + System.currentTimeMillis();
-    }
-
-    private void showErrorDialog(String message) {
-        Alert alert = new Alert(AlertType.ERROR);
-        alert.setTitle("Erreur");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    private void showInfoDialog(String message) {
-        Alert alert = new Alert(AlertType.INFORMATION);
-        alert.setTitle("Information");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+    private void showAlert(Alert.AlertType type, String header, String content) {
+        Alert a = new Alert(type);
+        a.setTitle(header);
+        a.setHeaderText(null);
+        a.setContentText(content);
+        a.showAndWait();
     }
 }

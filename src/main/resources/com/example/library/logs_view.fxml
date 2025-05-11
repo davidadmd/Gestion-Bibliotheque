@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/20"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.library.controller.LogsController"
+      spacing="10">
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
+
+    <Label text="Historique des Emprunts et Retours"
+           style="-fx-font-size: 18; -fx-font-weight: bold;"/>
+
+    <TableView fx:id="logsTable" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="userColumn"       text="Utilisateur"           prefWidth="150"/>
+            <TableColumn fx:id="bookColumn"       text="Livre"                 prefWidth="200"/>
+            <TableColumn fx:id="loanDateColumn"   text="Date Emprunt"          prefWidth="120"/>
+            <TableColumn fx:id="dueDateColumn"    text="Date Retour Prévue"    prefWidth="140"/>
+            <TableColumn fx:id="returnDateColumn" text="Date Retour Réelle"    prefWidth="140"/>
+        </columns>
+    </TableView>
+</VBox>
