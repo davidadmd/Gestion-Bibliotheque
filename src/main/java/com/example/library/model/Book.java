@@ -1,16 +1,13 @@
 package com.example.library.model;
 
-import java.time.LocalDate;
-
 public class Book {
     private int id;
     private String title;
     private String author;
     private String isbn;
     private String status;
-    private LocalDate loanDate; // Date d'emprunt, null si non emprunté
-    private String genre;
-    private String edition;
+    private String genre;    // Nouveau champ pour le genre
+    private String edition;  // Nouveau champ pour l'édition
 
     // Constructeur complet
     public Book(int id, String title, String author, String isbn, String status, String genre, String edition) {
@@ -21,14 +18,30 @@ public class Book {
         this.status = status;
         this.genre = genre;
         this.edition = edition;
-        this.loanDate = null; // Par défaut, le livre n'est pas emprunté
     }
 
-    // Constructeur sans argument (si nécessaire)
+    // Constructeur sans argument (utile pour JavaFX ou frameworks)
     public Book() {
     }
 
-    // Getters et Setters
+    // Getters et Setters pour les nouveaux champs
+    public String getGenre() {
+        return genre;
+    }
+
+    public void setGenre(String genre) {
+        this.genre = genre;
+    }
+
+    public String getEdition() {
+        return edition;
+    }
+
+    public void setEdition(String edition) {
+        this.edition = edition;
+    }
+
+    // Getters et Setters pour les autres champs
     public int getId() {
         return id;
     }
@@ -69,49 +82,7 @@ public class Book {
         this.status = status;
     }
 
-    public LocalDate getLoanDate() {
-        return loanDate;
-    }
-
-    public void setLoanDate(LocalDate loanDate) {
-        this.loanDate = loanDate;
-    }
-
-    public String getGenre() {
-        return genre;
-    }
-
-    public void setGenre(String genre) {
-        this.genre = genre;
-    }
-
-    public String getEdition() {
-        return edition;
-    }
-
-    public void setEdition(String edition) {
-        this.edition = edition;
-    }
-
-    /**
-     * Retourne la date limite d'emprunt (2 semaines après la date d'emprunt)
-     * ou null si le livre n'est pas emprunté.
-     */
-    public LocalDate getDueDate() {
-        return (loanDate != null) ? loanDate.plusWeeks(2) : null;
-    }
-
-    /**
-     * Vérifie si le livre est en retard d'emprunt (délai de 2 semaines dépassé).
-     * Retourne false si le livre n'est pas emprunté.
-     */
-    public boolean isOverdue() {
-        if (loanDate == null) {
-            return false;
-        }
-        return LocalDate.now().isAfter(getDueDate());
-    }
-
+    // Méthode toString (utile pour le débogage)
     @Override
     public String toString() {
         return "Book{" +
@@ -120,7 +91,6 @@ public class Book {
                 ", author='" + author + '\'' +
                 ", isbn='" + isbn + '\'' +
                 ", status='" + status + '\'' +
-                ", loanDate=" + loanDate +
                 ", genre='" + genre + '\'' +
                 ", edition='" + edition + '\'' +
                 '}';

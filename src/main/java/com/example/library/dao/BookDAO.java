@@ -74,19 +74,33 @@ public class BookDAO {
 
         return books;
     }
-
-    // Met à jour la date d'emprunt et le statut d'un livre
-    public void updateBookLoan(Book book) throws SQLException {
-        String sql = "UPDATE books SET loanDate = ?, status = ? WHERE id = ?";
+    
+    // Mettre à jour le statut d'un livre
+    public void updateBookStatus(int bookId, String newStatus) throws SQLException {
+        String sql = "UPDATE books SET status = ? WHERE id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            if (book.getLoanDate() != null) {
-                pstmt.setDate(1, Date.valueOf(book.getLoanDate()));
-            } else {
-                pstmt.setDate(1, null);
-            }
-            pstmt.setString(2, book.getStatus());
-            pstmt.setInt(3, book.getId());
+            pstmt.setString(1, newStatus);
+            pstmt.setInt(2, bookId);
             pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Erreur lors de la mise à jour du statut du livre : " + e.getMessage());
+            throw e;
+        }
+    }
+    
+    // Mettre à jour un livre avec toutes ses informations
+    public void updateBook(Book book) throws SQLException {
+        String sql = "UPDATE books SET title = ?, author = ?, genre = ?, edition = ? WHERE id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, book.getTitle());
+            pstmt.setString(2, book.getAuthor());
+            pstmt.setString(3, book.getGenre());
+            pstmt.setString(4, book.getEdition());
+            pstmt.setInt(5, book.getId());
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Erreur lors de la mise à jour du livre : " + e.getMessage());
+            throw e;
         }
     }
 }

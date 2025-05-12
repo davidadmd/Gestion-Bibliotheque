@@ -1,51 +1,94 @@
 /* Style global pour la fenêtre */
 .root {
     -fx-font-family: "Arial";
+    font-family: "Arial";
     -fx-background-color: #f4f4f4;
+    background-color: #f4f4f4;
     -fx-padding: 20px;
+    padding: 20px;
+}
+
+/* Styles pour la page de connexion */
+.title-text {
+    -fx-font-size: 24px;
+    font-size: 24px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-text-fill: #333333;
+}
+
+.subtitle-text {
+    -fx-font-size: 18px;
+    font-size: 18px;
+    -fx-text-fill: #555555;
+    -fx-padding: 0 0 10px 0;
+    padding: 0 0 10px 0;
+}
+
+.error-message {
+    -fx-text-fill: #e74c3c;
+    -fx-font-size: 14px;
+    font-size: 14px;
 }
 
 /* Style pour les champs de texte */
 .input-field {
     -fx-pref-width: 150px;
     -fx-padding: 5px;
+    padding: 5px;
     -fx-background-color: #ffffff;
+    background-color: #ffffff;
     -fx-border-radius: 5px;
+    border-radius: 5px;
     -fx-border-color: #cccccc;
+    border-color: #cccccc;
     -fx-font-size: 14px;
+    font-size: 14px;
 }
 
 /* Style pour les boutons */
 .button {
     -fx-background-color: #4CAF50;
+    background-color: #4CAF50;
     -fx-text-fill: white;
     -fx-font-size: 14px;
+    font-size: 14px;
     -fx-padding: 10px 20px;
+    padding: 10px 20px;
     -fx-border-radius: 5px;
+    border-radius: 5px;
     -fx-cursor: hand;
+    cursor: pointer;
 }
 
 .button:hover {
     -fx-background-color: #45a049;
+    background-color: #45a049;
 }
 
 /* Style pour les TableView */
 .table-view {
     -fx-pref-height: 300px;
     -fx-background-color: #ffffff;
+    background-color: #ffffff;
     -fx-border-color: #cccccc;
+    border-color: #cccccc;
     -fx-border-radius: 5px;
+    border-radius: 5px;
 }
 
 /* Style pour les en-têtes des colonnes */
 .table-column {
     -fx-text-fill: #333333;
     -fx-font-weight: bold;
+    font-weight: bold;
 }
 
 /* Style pour le label d'en-tête */
 .label {
     -fx-font-size: 20px;
+    font-size: 20px;
     -fx-font-weight: bold;
+    font-weight: bold;
     -fx-text-fill: #333333;
 }

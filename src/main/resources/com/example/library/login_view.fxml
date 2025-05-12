@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" 
+      fx:controller="com.example.library.controller.LoginController"
+      alignment="CENTER" spacing="20" stylesheets="@styles.css"
+      prefWidth="400" prefHeight="300">
+
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <Text styleClass="title-text" text="Gestion de Bibliothèque"/>
+    <Text styleClass="subtitle-text" text="Connexion"/>
+
+    <GridPane vgap="10" hgap="10" alignment="CENTER">
+        <Label text="Nom d'utilisateur:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+        <TextField fx:id="usernameField" promptText="Entrez votre nom d'utilisateur" 
+                   GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+        <Label text="Mot de passe:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+        <PasswordField fx:id="passwordField" promptText="Entrez votre mot de passe" 
+                      GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+    </GridPane>
+
+    <Button fx:id="loginButton" text="Se connecter" onAction="#handleLogin"
+            prefWidth="150"/>
+
+    <Label fx:id="errorMessage" styleClass="error-message" />
+</VBox>

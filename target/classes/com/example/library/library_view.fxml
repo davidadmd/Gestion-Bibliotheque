@@ -1,37 +1,176 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.geometry.Insets?>
+
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
 
-<VBox xmlns="http://javafx.com/javafx/20"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.example.library.controller.LibraryController"
-      spacing="10">
-    <padding>
-        <Insets top="10" right="10" bottom="10" left="10"/>
-    </padding>
+<BorderPane xmlns:fx="http://javafx.com/fxml" xmlns="http://javafx.com/javafx/20"
+           fx:controller="com.example.library.controller.LibraryController">
 
-    <!-- Formulaire d'ajout/suppression et accès aux logs -->
-    <HBox spacing="10">
-        <TextField fx:id="titleField"    promptText="Titre"  />
-        <TextField fx:id="authorField"   promptText="Auteur" />
-        <TextField fx:id="genreField"    promptText="Genre"  />
-        <TextField fx:id="editionField"  promptText="Édition"/>
-        <Button    text="Ajouter"        onAction="#addBook"/>
-        <Button    text="Supprimer"      onAction="#deleteBook"/>
-        <Button    text="Voir Logs"      onAction="#openLogs"/>
-    </HBox>
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: #f0f0f0; -fx-padding: 10px;">
+            <Label text="Logiciel de Gestion de Bibliothèque" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+            <Region HBox.hgrow="ALWAYS" />
+            <Button text="Rafraîchir" onAction="#refreshData" />
+            <Button text="Déconnexion" onAction="#logout" />
+        </HBox>
+    </top>
+    
+    <center>
+        <TabPane fx:id="mainTabPane" tabClosingPolicy="UNAVAILABLE">
+            <!-- Onglet 1 : Liste des livres -->
+            <Tab text="Liste des Livres">
+                <VBox spacing="10" style="-fx-padding: 10px;">
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <TextField fx:id="searchField" promptText="Rechercher un livre..." HBox.hgrow="ALWAYS"/>
+                        <ComboBox fx:id="searchTypeComboBox" promptText="Rechercher par..."/>
+                        <Button text="Rechercher" onAction="#searchBooks"/>
+                    </HBox>
+                    
+                    <TableView fx:id="allBooksTable" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="allTitleColumn" text="Titre" prefWidth="150"/>
+                            <TableColumn fx:id="allAuthorColumn" text="Auteur" prefWidth="100"/>
+                            <TableColumn fx:id="allGenreColumn" text="Genre" prefWidth="100"/>
+                            <TableColumn fx:id="allEditionColumn" text="Edition" prefWidth="80"/>
+                            <TableColumn fx:id="allIsbnColumn" text="ISBN" prefWidth="100"/>
+                            <TableColumn fx:id="allStatusColumn" text="Statut" prefWidth="80"/>
+                        </columns>
+                    </TableView>
+                    
+                    <HBox spacing="10" alignment="CENTER_RIGHT">
+                        <Label text="Total des livres: " />
+                        <Label fx:id="totalBooksLabel" text="0" style="-fx-font-weight: bold;" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label text="Livres disponibles: " />
+                        <Label fx:id="availableBooksLabel" text="0" style="-fx-font-weight: bold;" />
+                        <Label text="Livres empruntés: " />
+                        <Label fx:id="loanedBooksLabel" text="0" style="-fx-font-weight: bold;" />
+                    </HBox>
+                </VBox>
+            </Tab>
+            
+            <!-- Onglet 2 : Gestion des livres -->
+            <Tab text="Gestion des Livres">
+                <VBox spacing="10" style="-fx-padding: 10px;">
+                    <GridPane hgap="10" vgap="10">
+                        <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
+                        
+                        <Label text="Titre:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                        <TextField fx:id="titleField" promptText="Titre du livre" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                        
+                        <Label text="Auteur:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                        <TextField fx:id="authorField" promptText="Auteur du livre" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        
+                        <Label text="Genre:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                        <TextField fx:id="genreField" promptText="Genre du livre" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        
+                        <Label text="Edition:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                        <TextField fx:id="editionField" promptText="Edition du livre" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                        
+                        <HBox spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                            <Button text="Ajouter Livre" onAction="#addBook" />
+                            <Button text="Réinitialiser" onAction="#clearFields" />
+                        </HBox>
+                    </GridPane>
+                    
+                    <Label text="Liste des livres" style="-fx-font-weight: bold;" />
+                    
+                    <TableView fx:id="bookTable" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="titleColumn" text="Titre" prefWidth="150"/>
+                            <TableColumn fx:id="authorColumn" text="Auteur" prefWidth="100"/>
+                            <TableColumn fx:id="genreColumn" text="Genre" prefWidth="100"/>
+                            <TableColumn fx:id="editionColumn" text="Edition" prefWidth="80"/>
+                            <TableColumn fx:id="isbnColumn" text="ISBN" prefWidth="100"/>
+                            <TableColumn fx:id="statusColumn" text="Statut" prefWidth="80"/>
+                        </columns>
+                    </TableView>
+                    
+                    <HBox spacing="10" alignment="CENTER_RIGHT">
+                        <Button text="Modifier" onAction="#editBook" />
+                        <Button fx:id="saveBookButton" text="Sauvegarder" onAction="#saveBookChanges" />
+                        <Button text="Supprimer" onAction="#deleteBook" />
+                        <Button text="Changer Statut" onAction="#changeStatus" />
+                    </HBox>
+                </VBox>
+            </Tab>
+            
+            <!-- Onglet 3 : Gestion des Emprunts -->
+            <Tab text="Gestion des Emprunts">
+                <VBox spacing="10" style="-fx-padding: 10px;">
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="Gestion des Emprunts" style="-fx-font-weight: bold; -fx-font-size: 14px;" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button text="Rafraîchir" onAction="#refreshLoans" />
+                        <Button text="Vérifier Retards" onAction="#checkOverdueLoans" />
+                    </HBox>
+                    
+                    <!-- Section Nouvel Emprunt -->
+                    <TitledPane text="Nouveau Emprunt" expanded="false">
+                        <content>
+                            <GridPane hgap="10" vgap="10" style="-fx-padding: 10px;">
+                                <Label text="Livre:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                                <ComboBox fx:id="bookComboBox" promptText="Sélectionnez un livre" 
+                                         GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="2" />
+                                
+                                <Label text="Emprunteur:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                                <TextField fx:id="borrowerNameField" promptText="Nom de l'emprunteur" 
+                                         GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.columnSpan="2" />
+                                
+                                <Label text="Contact:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                                <TextField fx:id="borrowerContactField" promptText="Téléphone ou email" 
+                                         GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.columnSpan="2" />
+                                
+                                <Label text="Date d'emprunt:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                                <DatePicker fx:id="loanDatePicker" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                
+                                <Label text="Date de retour prévue:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                                <DatePicker fx:id="dueDatePicker" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                
+                                <HBox spacing="10" alignment="CENTER_RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                                    <Button text="Enregistrer l'emprunt" onAction="#saveLoan" style="-fx-background-color: #4CAF50; -fx-text-fill: white;" />
+                                    <Button text="Annuler" onAction="#clearLoanFields" />
+                                </HBox>
+                            </GridPane>
+                        </content>
+                    </TitledPane>
+                    
+                    <!-- Tableau des emprunts en cours -->
+                    <Label text="Emprunts en cours" style="-fx-font-weight: bold;" />
+                    <TableView fx:id="loansTable" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="loanIdColumn" text="#" prefWidth="40"/>
+                            <TableColumn fx:id="bookTitleColumn" text="Titre du livre" prefWidth="150"/>
+                            <TableColumn fx:id="borrowerNameColumn" text="Emprunteur" prefWidth="100"/>
+                            <TableColumn fx:id="borrowerContactColumn" text="Contact" prefWidth="100"/>
+                            <TableColumn fx:id="loanDateColumn" text="Date d'emprunt" prefWidth="100"/>
+                            <TableColumn fx:id="dueDateColumn" text="Date de retour" prefWidth="100"/>
+                            <TableColumn fx:id="daysRemainingColumn" text="Jours restants" prefWidth="80"/>
+                            <TableColumn fx:id="loanStatusColumn" text="Statut" prefWidth="80"/>
+                        </columns>
+                    </TableView>
+                    
+                    <HBox spacing="10" alignment="CENTER_RIGHT">
+                        <Button text="Retourner le livre" onAction="#returnBook" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label text="Emprunts en cours: " />
+                        <Label fx:id="activeLoansLabel" text="0" style="-fx-font-weight: bold;" />
+                        <Label text="Retards: " />
+                        <Label fx:id="overdueLoansLabel" text="0" style="-fx-font-weight: bold; -fx-text-fill: red;" />
+                    </HBox>
+                </VBox>
+            </Tab>
+            
 
-    <!-- TableView des livres (étend verticalement) -->
-    <TableView fx:id="bookTable" VBox.vgrow="ALWAYS">
-        <columns>
-            <TableColumn fx:id="titleColumn"    text="Titre"    prefWidth="150"/>
-            <TableColumn fx:id="authorColumn"   text="Auteur"   prefWidth="120"/>
-            <TableColumn fx:id="genreColumn"    text="Genre"    prefWidth="100"/>
-            <TableColumn fx:id="editionColumn"  text="Édition"  prefWidth="100"/>
-            <TableColumn fx:id="isbnColumn"     text="ISBN"     prefWidth="120"/>
-            <TableColumn fx:id="statusColumn"   text="Statut"   prefWidth="100"/>
-            <TableColumn fx:id="loanDateColumn" text="Emprunt"  prefWidth="130"/>
-        </columns>
-    </TableView>
-</VBox>
+        </TabPane>
+    </center>
+    
+    <bottom>
+        <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: #f0f0f0; -fx-padding: 5px;">
+            <Label text="© 2025 - Logiciel de Gestion de Bibliothèque" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Label fx:id="statusLabel" text="Prêt" />
+        </HBox>
+    </bottom>
+</BorderPane>
